@@ -1,31 +1,5 @@
 package db
 
 const (
-	insertRecipeQuery = `
-INSERT recipe
-SET 
-	ID = ?,
-	Title = ?,
-	Ingridients = ?,
-	Method = ?,
-	Time = ?,
-	Private = ?,
-	Tags = ?
-`
-	selectRecipeByID = `
-SELECT *
-FROM recipe
-WHERE ID = ?
-`
-	selectRecipeByTags = `
-SELECT * 
-FROM recipe
-JOIN tag ON id = id
-WHERE tag.ID IN ('?')
-`
-	updatePrivateRecipeQuery = `
-UPDATE recipe 
-SET Private = ? 
-WHERE ID = ?
-`
+	selectRecipeByIDQuery = "SELECT id, private, title, ingridients, time, method FROM recipes WHERE id = ?"
 )
