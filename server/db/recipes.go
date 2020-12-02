@@ -95,7 +95,7 @@ func (w *DBWrapper) UpdateRecipe(r *models.Recipe) error {
 		return fmt.Errorf("failed updating recipe: %v with: %s", r, err)
 	}
 
-	_, err = stmt.ExecContext(ctx, &r.ID, &r.Private, &r.Title, &r.Ingridients, &r.Time, &r.Method)
+	_, err = stmt.ExecContext(ctx, &r.Private, &r.Title, &r.Ingridients, &r.Time, &r.Method, &r.ID)
 	return err
 }
 

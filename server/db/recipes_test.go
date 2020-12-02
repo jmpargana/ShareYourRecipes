@@ -57,3 +57,49 @@ func TestInsertRecipeFail(t *testing.T) {
 	err := w.InsertRecipe(&r)
 	shouldntBeNil(t, err)
 }
+
+func TestUpdateRecipe(t *testing.T) {
+	w, mock, cancel := setupMock()
+	defer cancel()
+
+	prep := mock.ExpectPrepare(updateRecipeQueryTest)
+	prep.ExpectExec().WithArgs(r.Private, r.Title, r.Ingridients, r.Time, r.Method, r.ID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := w.UpdateRecipe(&r)
+	checkNil(t, err)
+}
+
+func TestUpdateRecipeFail(t *testing.T) {
+	w, mock, cancel := setupMock()
+	defer cancel()
+
+	prep := mock.ExpectPrepare(updateRecipeQueryFailTest)
+	prep.ExpectExec().WithArgs(r.Private, r.Title, r.Ingridients, r.Time, r.Method, r.ID).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err := w.UpdateRecipe(&r)
+	shouldntBeNil(t, err)
+}
+
+func TestDeleteRecipeByID(t *testing.T) {
+	w, mock, cancel := setupMock()
+	defer cancel()
+
+	prep := mock.ExpectPrepare(deleteRecipeByIDQueryTest)
+	prep.ExpectExec().WithArgs(r.ID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := w.DeleteRecipe(r.ID)
+	checkNil(t, err)
+}
+
+func TestDeleteRecipeByIDFail(t *testing.T) {
+	w, mock, cancel := setupMock()
+	defer cancel()
+
+	prep := mock.ExpectPrepare(deleteRecipeByIDQueryFailTest)
+	prep.ExpectExec().WithArgs(r.ID).WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err := w.DeleteRecipe(r.ID)
+	shouldntBeNil(t, err)
+}
