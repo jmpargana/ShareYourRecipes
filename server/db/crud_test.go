@@ -33,3 +33,39 @@ func TestFindRecipeByIDFail(t *testing.T) {
 	recipeNotNil(t, recipe)
 	shouldntBeNil(t, err)
 }
+
+func TestInsertRecipe(t *testing.T) {
+	w, mock, cancel := setupMock()
+	defer cancel()
+
+	prep := mock.ExpectPrepare(insertRecipeQueryTest)
+	prep.ExpectExec().WithArgs(r.ID, r.Private, r.Title, r.Ingridients, r.Time, r.Method).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := w.InsertRecipe(&r)
+	checkNil(t, err)
+}
+
+func TestInsertRecipeFail(t *testing.T) {
+	w, mock, cancel := setupMock()
+	defer cancel()
+
+	prep := mock.ExpectPrepare(insertRecipeQueryFailTest)
+	prep.ExpectExec().WithArgs(r.ID, r.Private, r.Title, r.Ingridients, r.Time, r.Method).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err := w.InsertRecipe(&r)
+	shouldntBeNil(t, err)
+}
+
+// func TestInsertAndSelectRecipe(t *testing.T) {
+// 	w, _, cancel := setupMock()
+// 	defer cancel()
+
+// 	err := w.InsertRecipe(&r)
+// 	checkNil(t, err)
+// 	recipe, err := w.FindRecipeByID(r.ID)
+
+// 	checkNil(t, err)
+// 	compareRecipes(t, recipe, &r)
+// }
