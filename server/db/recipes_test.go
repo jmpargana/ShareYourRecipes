@@ -10,8 +10,8 @@ func TestFindRecipeByID(t *testing.T) {
 	w, mock, cancel := setupMock()
 	defer cancel()
 
-	rows := sqlmock.NewRows([]string{"id", "private", "title", "ingridients", "time", "method"}).
-		AddRow(r.ID, r.Private, r.Title, r.Ingridients, r.Time, r.Method)
+	rows := sqlmock.NewRows([]string{"id", "private", "title", "time", "method"}).
+		AddRow(r.ID, r.Private, r.Title, r.Time, r.Method)
 
 	mock.ExpectQuery(selectRecipeByIDQueryTest).WithArgs(r.ID).WillReturnRows(rows)
 
@@ -24,7 +24,7 @@ func TestFindRecipeByIDFail(t *testing.T) {
 	w, mock, cancel := setupMock()
 	defer cancel()
 
-	rows := sqlmock.NewRows([]string{"id", "private", "title", "ingridients", "time", "method"})
+	rows := sqlmock.NewRows([]string{"id", "private", "title", "time", "method"})
 
 	mock.ExpectQuery(selectRecipeByIDQueryTest).WithArgs(r.ID).WillReturnRows(rows)
 
@@ -39,7 +39,7 @@ func TestInsertRecipe(t *testing.T) {
 	defer cancel()
 
 	prep := mock.ExpectPrepare(insertRecipeQueryTest)
-	prep.ExpectExec().WithArgs(r.ID, r.Private, r.Title, r.Ingridients, r.Time, r.Method).
+	prep.ExpectExec().WithArgs(r.ID, r.Private, r.Title, r.Time, r.Method).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := w.InsertRecipe(&r)
@@ -51,7 +51,7 @@ func TestInsertRecipeFail(t *testing.T) {
 	defer cancel()
 
 	prep := mock.ExpectPrepare(insertRecipeQueryFailTest)
-	prep.ExpectExec().WithArgs(r.ID, r.Private, r.Title, r.Ingridients, r.Time, r.Method).
+	prep.ExpectExec().WithArgs(r.ID, r.Private, r.Title, r.Time, r.Method).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 
 	err := w.InsertRecipe(&r)
@@ -63,7 +63,7 @@ func TestUpdateRecipe(t *testing.T) {
 	defer cancel()
 
 	prep := mock.ExpectPrepare(updateRecipeQueryTest)
-	prep.ExpectExec().WithArgs(r.Private, r.Title, r.Ingridients, r.Time, r.Method, r.ID).
+	prep.ExpectExec().WithArgs(r.Private, r.Title, r.Time, r.Method, r.ID).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := w.UpdateRecipe(&r)
@@ -75,7 +75,7 @@ func TestUpdateRecipeFail(t *testing.T) {
 	defer cancel()
 
 	prep := mock.ExpectPrepare(updateRecipeQueryFailTest)
-	prep.ExpectExec().WithArgs(r.Private, r.Title, r.Ingridients, r.Time, r.Method, r.ID).
+	prep.ExpectExec().WithArgs(r.Private, r.Title, r.Time, r.Method, r.ID).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 
 	err := w.UpdateRecipe(&r)

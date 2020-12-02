@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
 	"server/models"
 	"time"
 )
@@ -11,11 +10,16 @@ import (
 func (w *DBWrapper) FindRecipeByID(id int) (*models.Recipe, error) {
 	r := new(models.Recipe)
 
+	// 1. Fetch Recipe
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	err := w.db.QueryRowContext(ctx, selectRecipeByIDQuery, id).
-		Scan(&r.ID, &r.Private, &r.Title, &r.Ingridients, &r.Time, &r.Method)
+		Scan(&r.ID, &r.Private, &r.Title, &r.Time, &r.Method)
+
+	// 2. Fetch all Ingridients
+
+	// 3. Fetch all tags
 
 	if err != nil {
 		return nil, err
@@ -56,7 +60,6 @@ func (w *DBWrapper) FindAllRecipes() (r []*models.Recipe, err error) {
 			&recipe.ID,
 			&recipe.Private,
 			&recipe.Title,
-			&recipe.Ingridients,
 			&recipe.Time,
 			&recipe.Method,
 		)
@@ -74,15 +77,22 @@ func (w *DBWrapper) InsertRecipe(r *models.Recipe) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	if err := w.InsertTags(r.ID, r.Tags); err != nil {
+		return fmt.Errorf("failed creating tags for recipe with: %s", err)
+	}
+
+	if err := w.InsertIngridients(r.ID, r.Ingridients); err != nil {
+		return fmt.Errorf("failed creating tags for recipe with: %s", err)
+	}
+
 	stmt, err := w.db.PrepareContext(ctx, insertRecipeQuery)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	result, err := stmt.ExecContext(ctx, &r.ID, &r.Private, &r.Title, &r.Ingridients, &r.Time, &r.Method)
+	_, err = stmt.ExecContext(ctx, &r.ID, &r.Private, &r.Title, &r.Time, &r.Method)
 
-	log.Println(result)
 	return err
 }
 
@@ -95,7 +105,7 @@ func (w *DBWrapper) UpdateRecipe(r *models.Recipe) error {
 		return fmt.Errorf("failed updating recipe: %v with: %s", r, err)
 	}
 
-	_, err = stmt.ExecContext(ctx, &r.Private, &r.Title, &r.Ingridients, &r.Time, &r.Method, &r.ID)
+	_, err = stmt.ExecContext(ctx, &r.Private, &r.Title, &r.Time, &r.Method, &r.ID)
 	return err
 }
 
