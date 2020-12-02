@@ -57,15 +57,3 @@ func TestInsertRecipeFail(t *testing.T) {
 	err := w.InsertRecipe(&r)
 	shouldntBeNil(t, err)
 }
-
-// func TestInsertAndSelectRecipe(t *testing.T) {
-// 	w, _, cancel := setupMock()
-// 	defer cancel()
-
-// 	err := w.InsertRecipe(&r)
-// 	checkNil(t, err)
-// 	recipe, err := w.FindRecipeByID(r.ID)
-
-// 	checkNil(t, err)
-// 	compareRecipes(t, recipe, &r)
-// }

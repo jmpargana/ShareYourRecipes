@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"server/models"
 	"time"
@@ -23,35 +24,50 @@ func (w *DBWrapper) FindRecipeByID(id int) (*models.Recipe, error) {
 	return r, nil
 }
 
-// Find attaches the user repository and find all data
-func (w *DBWrapper) Find() ([]*UserModel, error) {
-	users := make([]*UserModel, 0)
+func (w *DBWrapper) FindRecipesByTags(tags []string) (r []*models.Recipe, err error) {
+	for _, tag := range tags {
+		recipes, err := w.FindRecipesByTag(tag)
+		if err != nil {
+			return nil, fmt.Errorf("failed fetching recipes by tags with tag: %s with: %s", tag, err)
+		}
+		r = append(r, recipes)
+	}
 
+	return
+}
+
+func (w *DBWrapper) FindRecipesByTag(tag string) ([]*models.Recipe, error) {
+	return nil, nil
+}
+
+func (w *DBWrapper) FindAllRecipes() (r []*models.Recipe, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	rows, err := w.db.QueryContext(ctx, "SELECT id, name, email, phone FROM users")
+	rows, err := w.db.QueryContext(ctx, selectAllRecipes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed fetching all recipes with: %s", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		user := new(UserModel)
+		recipe := new(models.Recipe)
 		err = rows.Scan(
-			&user.ID,
-			&user.Name,
-			&user.Email,
-			&user.Phone,
+			&recipe.ID,
+			&recipe.Private,
+			&recipe.Title,
+			&recipe.Ingridients,
+			&recipe.Time,
+			&recipe.Method,
 		)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed scanning recipe with: %s", err)
 		}
-		users = append(users, user)
-	}
 
-	return users, nil
+		r = append(r, recipe)
+	}
+	return
 }
 
 func (w *DBWrapper) InsertRecipe(r *models.Recipe) error {
