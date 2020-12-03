@@ -10,21 +10,28 @@ import (
 func (w *DBWrapper) FindRecipeByID(id int) (*models.Recipe, error) {
 	r := new(models.Recipe)
 
-	// 1. Fetch Recipe
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	var private int
 	err := w.db.QueryRowContext(ctx, selectRecipeByIDQuery, id).
-		Scan(&r.ID, &r.Private, &r.Title, &r.Time, &r.Method)
-
-	// 2. Fetch all Ingridients
-
-	// 3. Fetch all tags
+		Scan(&r.ID, &r.UserID, &private, &r.Title, &r.Time, &r.Method)
 
 	if err != nil {
 		return nil, err
 	}
 
+	if private == 1 {
+		r.Private = true
+	}
+
+	if err := w.FindIngridientsByRecipeID(r); err != nil {
+		return nil, err
+	}
+
+	if err := w.FindTagsByRecipeID(r); err != nil {
+		return nil, err
+	}
 	return r, nil
 }
 
@@ -64,8 +71,10 @@ func (w *DBWrapper) FindAllPublicRecipes() (r []*models.Recipe, err error) {
 
 	for rows.Next() {
 		recipe := new(models.Recipe)
+		var private int
 		err = rows.Scan(
 			&recipe.ID,
+			&recipe.UserID,
 			&recipe.Private,
 			&recipe.Title,
 			&recipe.Time,
@@ -74,6 +83,17 @@ func (w *DBWrapper) FindAllPublicRecipes() (r []*models.Recipe, err error) {
 
 		if err != nil {
 			return nil, fmt.Errorf("failed scanning recipe with: %s", err)
+		}
+		if private == 1 {
+			recipe.Private = true
+		}
+
+		if err := w.FindIngridientsByRecipeID(recipe); err != nil {
+			return nil, err
+		}
+
+		if err := w.FindTagsByRecipeID(recipe); err != nil {
+			return nil, err
 		}
 
 		r = append(r, recipe)

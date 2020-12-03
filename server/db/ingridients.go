@@ -56,3 +56,26 @@ func (w *DBWrapper) FindIngridient(ingridient models.Ingridient) (id int, err er
 
 	return
 }
+
+func (w *DBWrapper) FindIngridientsByRecipeID(recipe *models.Recipe) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := w.db.QueryContext(ctx, selectIngridientsByRecipeID, r.ID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var ingridient string
+		err := rows.Scan(&ingridient)
+		if err != nil {
+			return fmt.Errorf("failed scanning ingridient with: %s", err)
+		}
+
+		r.Ingridients = append(r.Ingridients, models.Ingridient(ingridient))
+	}
+
+	return nil
+}

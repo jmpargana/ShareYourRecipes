@@ -56,3 +56,26 @@ func (w *DBWrapper) FindTag(tag models.Tag) (id int, err error) {
 
 	return
 }
+
+func (w *DBWrapper) FindTagsByRecipeID(recipe *models.Recipe) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := w.db.QueryContext(ctx, selectTagsByRecipeID, r.ID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var tag string
+		err := rows.Scan(&tag)
+		if err != nil {
+			return fmt.Errorf("failed scanning tag with: %s", err)
+		}
+
+		r.Tags = append(r.Tags, models.Tag(tag))
+	}
+
+	return nil
+}

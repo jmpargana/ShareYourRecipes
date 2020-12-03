@@ -4,7 +4,7 @@ import "server/models"
 
 var (
 	selectRecipeByIDQueryTest     = "SELECT id, private, title, time, method FROM recipes WHERE id = \\?"
-	insertRecipeQueryTest         = "INSERT INTO recipes \\(id, private, title, time, method\\) VALUES \\(\\?, \\?, \\?, \\?, \\?, \\?\\)"
+	insertRecipeQueryTest         = "INSERT INTO recipes \\(id, userid, private, title, time, method\\) VALUES \\(\\?, \\?, \\?, \\?, \\?, \\?\\)"
 	insertRecipeQueryFailTest     = "INSERT INTO recipe \\(id, private, title, time, method\\) VALUES \\(\\?, \\?, \\?, \\?, \\?, \\?\\)"
 	updateRecipeQueryTest         = "UPDATE recipes SET private = \\?, title = \\?, time = \\?, method = \\?  WHERE id = \\?"
 	updateRecipeQueryFailTest     = "UPDATE recipe SET private = \\?, title = \\?, time = \\?, method = \\?  WHERE id = \\?"
