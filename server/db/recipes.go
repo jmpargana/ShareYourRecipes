@@ -28,7 +28,7 @@ func (w *DBWrapper) FindRecipeByID(id int) (*models.Recipe, error) {
 	return r, nil
 }
 
-func (w *DBWrapper) FindRecipesByTags(tags []string) (r []*models.Recipe, err error) {
+func (w *DBWrapper) FindRecipesByTags(tags []models.Tag) (r []*models.Recipe, err error) {
 	for _, tag := range tags {
 		recipes, err := w.FindRecipesByTag(tag)
 		if err != nil {
@@ -40,11 +40,19 @@ func (w *DBWrapper) FindRecipesByTags(tags []string) (r []*models.Recipe, err er
 	return
 }
 
-func (w *DBWrapper) FindRecipesByTag(tag string) ([]*models.Recipe, error) {
+func (w *DBWrapper) FindAllUsersRecipes(userID int) ([]*models.Recipe, error) {
 	return nil, nil
 }
 
-func (w *DBWrapper) FindAllRecipes() (r []*models.Recipe, err error) {
+func (w *DBWrapper) FindRecipesByTag(tag models.Tag) ([]*models.Recipe, error) {
+	return nil, nil
+}
+
+func (w *DBWrapper) FindRecipesByIngridient(ingridient models.Ingridient) ([]*models.Recipe, error) {
+	return nil, nil
+}
+
+func (w *DBWrapper) FindAllPublicRecipes() (r []*models.Recipe, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

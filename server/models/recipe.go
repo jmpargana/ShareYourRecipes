@@ -2,16 +2,18 @@ package models
 
 type Recipe struct {
 	ID          int
+	UserID      int
 	Title       string
-	Ingridients []string
+	Ingridients []Ingridient
 	Method      string
 	Time        int
-	Private     int
-	Tags        []string
+	Private     bool
+	Tags        []Tag
 }
 
 func (r *Recipe) Equals(other *Recipe) bool {
 	return r.ID == other.ID &&
+		r.UserID == other.UserID &&
 		r.Title == other.Title &&
 		r.Method == other.Method &&
 		r.Time == other.Time &&
