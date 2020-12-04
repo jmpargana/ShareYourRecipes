@@ -119,7 +119,7 @@ func (w *DBWrapper) InsertRecipe(r *models.Recipe) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, &r.ID, &r.Private, &r.Title, &r.Time, &r.Method)
+	_, err = stmt.ExecContext(ctx, &r.ID, &r.UserID, &r.Private, &r.Title, &r.Time, &r.Method)
 
 	return err
 }

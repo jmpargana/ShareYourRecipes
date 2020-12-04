@@ -116,3 +116,39 @@ func TestInsertionMultipleIngridientsWithDuplicates(t *testing.T) {
 		})
 	}
 }
+
+func TestFindIngridientByRecipeID(t *testing.T) {
+	t.Parallel()
+
+	recipe1 := &models.Recipe{
+		ID:          30,
+		UserID:      50,
+		Private:     false,
+		Title:       "cozido",
+		Ingridients: []models.Ingridient{"arroz", "chourico"},
+		Time:        30,
+		Method:      "cozer",
+		Tags:        []models.Tag{"portuguese"},
+	}
+
+	recipe2 := &models.Recipe{
+		ID:          31,
+		UserID:      50,
+		Private:     false,
+		Title:       "borrego",
+		Ingridients: []models.Ingridient{"carne", "borrego"},
+		Time:        30,
+		Method:      "cozer",
+		Tags:        []models.Tag{"portuguese"},
+	}
+
+	assertNil(t, w.InsertRecipe(recipe1))
+	assertNil(t, w.InsertRecipe(recipe2))
+
+	recipe, err := w.FindRecipeByID(recipe1.ID)
+	assertNil(t, err)
+
+	if len(recipe.Ingridients) != len(recipe1.Ingridients) {
+		t.Fatalf("failed, got: %v, expected: %v", recipe.Ingridients, recipe1.Ingridients)
+	}
+}
