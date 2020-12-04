@@ -59,3 +59,7 @@ func TestTagInsertAndFind(t *testing.T) {
 func TestInsertionMultipleTagsWithDuplicates(t *testing.T) {
 
 }
+
+func TestInvalidTag(t *testing.T) {
+
+}
