@@ -17,5 +17,5 @@ func (w *DBWrapper) InsertRecipeTag(recipeID, tagID int) error {
 	defer stmt.Close()
 
 	_, err = stmt.ExecContext(ctx, recipeID, tagID)
-	return fmt.Errorf("failed inserting recipetag with: %s", err)
+	return err
 }

@@ -1,6 +1,18 @@
 package db
 
+var (
+	// Schame
+	tables = []string{
+		"CREATE TABLE IF NOT EXISTS recipes (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userid INT, private INT, title TEXT, time INT, method TEXT)",
+		"CREATE TABLE IF NOT EXISTS tags (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, name TEXT)",
+		"CREATE TABLE IF NOT EXISTS recipetags (recipeid INT NOT NULL PRIMARY KEY, tagid INT NOT NULL)",
+		"CREATE TABLE IF NOT EXISTS ingridients (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, name TEXT)",
+		"CREATE TABLE IF NOT EXISTS recipeingridients (recipeid INT, ingridientid INT)",
+	}
+)
+
 const (
+
 	// Recipes
 	selectRecipeByIDQuery = "SELECT id, private, title, ingridients, time, method FROM recipes WHERE id = ?"
 	selectAllRecipes      = "SELECT id, private, title, ingridients, time, method FROM recipes WHERE private = 0"

@@ -34,8 +34,7 @@ func (w *DBWrapper) InsertTag(id int, tag models.Tag) error {
 		}
 
 		tagID, err = w.FindTag(tag)
-	}
-	if err != nil {
+	} else if err != nil {
 		return fmt.Errorf("nothing returned from select tag query: %s", err)
 	}
 
@@ -57,7 +56,7 @@ func (w *DBWrapper) FindTag(tag models.Tag) (id int, err error) {
 	return
 }
 
-func (w *DBWrapper) FindTagsByRecipeID(recipe *models.Recipe) error {
+func (w *DBWrapper) FindTagsByRecipeID(r *models.Recipe) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
