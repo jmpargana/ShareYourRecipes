@@ -1,0 +1,9 @@
+language: go
+
+go:
+  - "1.15"
+
+services:
+  - docker
+
+script: go test -v server/...
