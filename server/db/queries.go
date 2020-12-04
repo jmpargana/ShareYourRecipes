@@ -5,7 +5,7 @@ var (
 	tables = []string{
 		"CREATE TABLE IF NOT EXISTS recipes (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userid INT, private INT, title TEXT, time INT, method TEXT)",
 		"CREATE TABLE IF NOT EXISTS tags (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, name TEXT)",
-		"CREATE TABLE IF NOT EXISTS recipetags (recipeid INT NOT NULL PRIMARY KEY, tagid INT NOT NULL)",
+		"CREATE TABLE IF NOT EXISTS recipetags (recipeid INT NOT NULL, tagid INT NOT NULL, PRIMARY KEY(recipeid, tagid), FOREIGN KEY(recipeid) REFERENCES recipes(id), FOREIGN KEY(tagid) REFERENCES tags(id))",
 		"CREATE TABLE IF NOT EXISTS ingridients (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, name TEXT)",
 		"CREATE TABLE IF NOT EXISTS recipeingridients (recipeid INT, ingridientid INT)",
 	}

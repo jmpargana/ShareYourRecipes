@@ -17,7 +17,7 @@ func (w *DBWrapper) InsertTags(id int, tags []models.Tag) error {
 }
 
 func (w *DBWrapper) InsertTag(id int, tag models.Tag) error {
-	tagID, err := w.FindTag(tag)
+	_, err := w.FindTag(tag)
 
 	if err == ErrNoID {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -33,12 +33,13 @@ func (w *DBWrapper) InsertTag(id int, tag models.Tag) error {
 			return fmt.Errorf("failed inserting tag with: %s", err)
 		}
 
-		tagID, err = w.FindTag(tag)
+		_, err = w.FindTag(tag)
 	} else if err != nil {
 		return fmt.Errorf("nothing returned from select tag query: %s", err)
 	}
 
-	return w.InsertRecipeTag(id, tagID)
+	// return w.InsertRecipeTag(id, tagID)
+	return nil
 }
 
 /// Insert Tag if non existent with NULL id and retrieve ID for recipetags table.
