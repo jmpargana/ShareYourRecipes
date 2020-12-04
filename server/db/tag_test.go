@@ -42,12 +42,12 @@ func TestTagInsertAndFind(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			stmt, err := w.db.PrepareContext(ctx, "SELECT recipeid FROM recipetags where tagid = ?")
-			if err != nil {
-				log.Fatal(err)
-			}
+			// stmt, err := w.db.PrepareContext(ctx, "SELECT recipeid FROM recipetags WHERE tagid = ?")
+			// if err != nil {
+			// 	log.Fatal(err)
+			// }
 
-			rows, err := stmt.Query(id1)
+			rows, err := w.db.QueryContext(ctx, "SELECT recipeid FROM recipetags WHERE tagid = ?", id2)
 			if err != nil {
 				log.Fatal(err)
 			}

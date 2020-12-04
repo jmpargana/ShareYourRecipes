@@ -39,7 +39,6 @@ func (w *DBWrapper) InsertTag(id int, tag models.Tag) error {
 	}
 
 	return w.InsertRecipeTag(id, tagID)
-	// return nil
 }
 
 /// Insert Tag if non existent with NULL id and retrieve ID for recipetags table.
