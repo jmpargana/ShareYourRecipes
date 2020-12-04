@@ -7,7 +7,7 @@ var (
 		"CREATE TABLE IF NOT EXISTS tags (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, name TEXT)",
 		"CREATE TABLE IF NOT EXISTS recipetags (recipeid INT NOT NULL, tagid INT NOT NULL, PRIMARY KEY(recipeid, tagid))",
 		"CREATE TABLE IF NOT EXISTS ingridients (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, name TEXT)",
-		"CREATE TABLE IF NOT EXISTS recipeingridients (recipeid INT NOT NULL, ingridientid INT NOT NULL, PRIMARY KEY(recipeid, ingridientid), FOREIGN KEY(recipeid) REFERENCES recipes(id), FOREIGN KEY(ingridientid) REFERENCES ingridients(id))",
+		"CREATE TABLE IF NOT EXISTS recipeingridients (recipeid INT NOT NULL, ingridientid INT NOT NULL, PRIMARY KEY(recipeid, ingridientid))",
 	}
 )
 
@@ -36,5 +36,5 @@ const (
 	insertIngridientQuery       = "INSERT INTO ingridients (id, name) VALUES (NULL, ?)"
 
 	// RecipeIngridients
-	insertRecipeIngridientQuery = "INSERT INTO recipeingridients (recipeid, ingridientID) VALUES (?, ?)"
+	insertRecipeIngridientQuery = "INSERT IGNORE INTO recipeingridients (recipeid, ingridientID) VALUES (?, ?)"
 )

@@ -17,5 +17,5 @@ func (w *DBWrapper) InsertRecipeIngridient(recipeID, ingridientID int) error {
 	defer stmt.Close()
 
 	_, err = stmt.ExecContext(ctx, recipeID, ingridientID)
-	return fmt.Errorf("failed inserting recipeingridient with: %s", err)
+	return err
 }

@@ -34,8 +34,7 @@ func (w *DBWrapper) InsertIngridient(id int, ingridient models.Ingridient) error
 		}
 
 		ingridientID, err = w.FindIngridient(ingridient)
-	}
-	if err != nil {
+	} else if err != nil {
 		return fmt.Errorf("nothing returned from select tag query: %s", err)
 	}
 
