@@ -16,7 +16,7 @@ const (
 	// Recipes
 	selectRecipeByIDQuery = "SELECT userid, private, title, time, method FROM recipes WHERE id = ?"
 	selectAllRecipes      = "SELECT id, userid, private, title, time, method FROM recipes WHERE private = 0"
-	insertRecipeQuery     = "INSERT INTO recipes (id, userid, private, title, time, method) VALUES (?, ?, ?, ?, ?, ?)"
+	insertRecipeQuery     = "INSERT IGNORE INTO recipes (id, userid, private, title, time, method) VALUES (?, ?, ?, ?, ?, ?)"
 	updateRecipeQuery     = "UPDATE recipes SET userid = ?, private = ?, title = ?, time = ?, method = ? WHERE id = ?"
 	deleteRecipeByIDQuery = "DELETE FROM recipes WHERE id = ?"
 

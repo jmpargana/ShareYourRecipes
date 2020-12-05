@@ -16,7 +16,7 @@ func TestRecipeTagsInsertAndFind(t *testing.T) {
 	}{
 		"no duplicates": {
 			rt: []recipetag{
-				{50, 2},
+				{50, 80},
 			},
 			expected: []int{50},
 		},
