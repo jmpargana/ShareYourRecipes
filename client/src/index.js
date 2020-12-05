@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Auth0Provider } from "./helpers/react-auth0-spa";
-import config from "./utils/auth_config.json";
+import {Auth0Provider} from './helpers/react-auth0-spa';
+import config from './utils/auth_config.json';
 import history from "./utils/history";
 
-const onRedirectCallback = (appState: any) => {
+const onRedirectCallback = appState => {
   history.push(
     appState && appState.targetUrl
       ? appState.targetUrl
@@ -15,16 +15,16 @@ const onRedirectCallback = (appState: any) => {
 };
 
 ReactDOM.render(
-  <Auth0Provider
-    domain={config.domain}
-    client_id={config.clientId}
-    redirect_uri={window.location.origin}
-    onRedirectCallback={onRedirectCallback}
-  >
-    <React.StrictMode>
+  <React.StrictMode>
+    <Auth0Provider
+      domain={config.domain}
+      client_id={config.clientId}
+      redirect_uri={window.location.origin}
+      onRedirectCallback={onRedirectCallback}
+    >
       <App />
-    </React.StrictMode>
-  </Auth0Provider>,
+    </Auth0Provider>
+  </React.StrictMode>,
   document.getElementById('root')
 );
 
