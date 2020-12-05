@@ -1,8 +1,9 @@
 package main
 
 import (
+	"net/http"
 	"os"
-	"server/db"
+	"server/router"
 )
 
 var (
@@ -13,8 +14,11 @@ var (
 )
 
 func main() {
-	_, err := db.New("mysql", db.GenerateDSN(user, password, endPoint, database), 0, 0)
-	if err != nil {
-		panic(err)
-	}
+	// _, err := db.New("mysql", db.GenerateDSN(user, password, endPoint, database), 0, 0)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	r := router.New()
+
+	http.ListenAndServe(":8080", r)
 }
