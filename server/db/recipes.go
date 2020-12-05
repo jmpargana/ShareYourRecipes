@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"server/models"
 	"time"
@@ -61,81 +62,75 @@ func (w *DBWrapper) FindRecipesByIngridient(ingridient models.Ingridient) ([]*mo
 }
 
 func (w *DBWrapper) FindAllPublicRecipes() (r []*models.Recipe, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	w.queryRows(
+		selectAllRecipes,
 
-	rows, err := w.db.QueryContext(ctx, selectAllRecipes)
-	if err != nil {
-		return nil, fmt.Errorf("failed fetching all recipes with: %s", err)
-	}
-	defer rows.Close()
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				recipe := new(models.Recipe)
+				var private int
+				err = rows.Scan(
+					&recipe.ID,
+					&recipe.UserID,
+					&recipe.Private,
+					&recipe.Title,
+					&recipe.Time,
+					&recipe.Method,
+				)
 
-	for rows.Next() {
-		recipe := new(models.Recipe)
-		var private int
-		err = rows.Scan(
-			&recipe.ID,
-			&recipe.UserID,
-			&recipe.Private,
-			&recipe.Title,
-			&recipe.Time,
-			&recipe.Method,
-		)
+				if err != nil {
+					return fmt.Errorf("failed scanning recipe with: %s", err)
+				}
+				if private == 1 {
+					recipe.Private = true
+				}
 
-		if err != nil {
-			return nil, fmt.Errorf("failed scanning recipe with: %s", err)
-		}
-		if private == 1 {
-			recipe.Private = true
-		}
+				if err := w.FindIngridientsByRecipeID(recipe); err != nil {
+					return err
+				}
 
-		if err := w.FindIngridientsByRecipeID(recipe); err != nil {
-			return nil, err
-		}
+				if err := w.FindTagsByRecipeID(recipe); err != nil {
+					return err
+				}
 
-		if err := w.FindTagsByRecipeID(recipe); err != nil {
-			return nil, err
-		}
+				r = append(r, recipe)
+			}
+			rows.Close()
+			return nil
+		},
+	)
 
-		r = append(r, recipe)
-	}
 	return
 }
 
 func (w *DBWrapper) InsertRecipe(r *models.Recipe) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := w.InsertTags(r.ID, r.Tags); err != nil {
-		return fmt.Errorf("failed creating tags for recipe with: %s", err)
-	}
-
-	if err := w.InsertIngridients(r.ID, r.Ingridients); err != nil {
-		return fmt.Errorf("failed creating tags for recipe with: %s", err)
-	}
-
-	stmt, err := w.db.PrepareContext(ctx, insertRecipeQuery)
-	if err != nil {
+	if err := w.execQueryWithPrepare(
+		insertRecipeQuery,
+		r.ID,
+		r.UserID,
+		r.Private,
+		r.Title,
+		r.Time,
+		r.Method,
+	); err != nil {
 		return err
 	}
-	defer stmt.Close()
-
-	_, err = stmt.ExecContext(ctx, r.ID, r.UserID, r.Private, r.Title, r.Time, r.Method)
-
-	return err
+	return w.insertOrUpdateTagsAndIngridients(r)
 }
 
 func (w *DBWrapper) UpdateRecipe(r *models.Recipe) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	stmt, err := w.db.PrepareContext(ctx, updateRecipeQuery)
-	if err != nil {
-		return fmt.Errorf("failed updating recipe: %v with: %s", r, err)
+	if err := w.execQueryWithPrepare(
+		updateRecipeQuery,
+		r.UserID,
+		r.Private,
+		r.Title,
+		r.Time,
+		r.Method,
+		r.ID,
+	); err != nil {
+		return err
 	}
-
-	_, err = stmt.ExecContext(ctx, &r.Private, &r.Title, &r.Time, &r.Method, &r.ID)
-	return err
+	return w.insertOrUpdateTagsAndIngridients(r)
 }
 
 func (w *DBWrapper) DeleteRecipe(id int) error {
@@ -152,4 +147,9 @@ func (w *DBWrapper) DeleteRecipe(id int) error {
 	return err
 }
 
-func FindRecipes() {}
+func (w *DBWrapper) insertOrUpdateTagsAndIngridients(r *models.Recipe) error {
+	if err := w.InsertTags(r.ID, r.Tags); err != nil {
+		return err
+	}
+	return w.InsertIngridients(r.ID, r.Ingridients)
+}
