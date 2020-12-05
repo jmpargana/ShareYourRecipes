@@ -44,6 +44,7 @@ func TestRecipeInsertFind(t *testing.T) {
 
 func TestInsertAllRecipesAndFindOneByOne(t *testing.T) {
 	recipes := []*models.Recipe{
+		// Same ID as previous test should not be inserted but still found
 		{
 			ID:          11,
 			UserID:      7,

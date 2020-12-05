@@ -151,3 +151,5 @@ func (w *DBWrapper) DeleteRecipe(id int) error {
 	_, err = stmt.ExecContext(ctx, id)
 	return err
 }
+
+func FindRecipes() {}
