@@ -9,13 +9,14 @@ import (
 
 func (w *DBWrapper) FindRecipeByID(id int) (*models.Recipe, error) {
 	r := new(models.Recipe)
+	r.ID = id
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var private int
 	err := w.db.QueryRowContext(ctx, selectRecipeByIDQuery, id).
-		Scan(&r.ID, &r.UserID, &private, &r.Title, &r.Time, &r.Method)
+		Scan(&r.UserID, &private, &r.Title, &r.Time, &r.Method)
 
 	if err != nil {
 		return nil, err
@@ -119,7 +120,7 @@ func (w *DBWrapper) InsertRecipe(r *models.Recipe) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, &r.ID, &r.UserID, &r.Private, &r.Title, &r.Time, &r.Method)
+	_, err = stmt.ExecContext(ctx, r.ID, r.UserID, r.Private, r.Title, r.Time, r.Method)
 
 	return err
 }

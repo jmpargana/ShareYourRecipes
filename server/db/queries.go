@@ -14,7 +14,7 @@ var (
 const (
 
 	// Recipes
-	selectRecipeByIDQuery = "SELECT id, userid, private, title, time, method FROM recipes WHERE id = ?"
+	selectRecipeByIDQuery = "SELECT userid, private, title, time, method FROM recipes WHERE id = ?"
 	selectAllRecipes      = "SELECT id, userid, private, title, time, method FROM recipes WHERE private = 0"
 	insertRecipeQuery     = "INSERT INTO recipes (id, userid, private, title, time, method) VALUES (?, ?, ?, ?, ?, ?)"
 	updateRecipeQuery     = "UPDATE recipes SET userid = ?, private = ?, title = ?, time = ?, method = ? WHERE id = ?"
@@ -36,5 +36,5 @@ const (
 	insertIngridientQuery       = "INSERT INTO ingridients (id, name) VALUES (NULL, ?)"
 
 	// RecipeIngridients
-	insertRecipeIngridientQuery = "INSERT IGNORE INTO recipeingridients (recipeid, ingridientID) VALUES (?, ?)"
+	insertRecipeIngridientQuery = "INSERT IGNORE INTO recipeingridients (recipeid, ingridientid) VALUES (?, ?)"
 )

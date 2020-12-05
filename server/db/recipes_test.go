@@ -1,28 +1,33 @@
 package db
 
-// func TestRecipeInsertFind(t *testing.T) {
-// 	t.Parallel()
+import (
+	"server/models"
+	"testing"
+)
 
-// 	recipes := []*models.Recipe{
-// 		{
-// 			ID:          10,
-// 			UserID:      2,
-// 			Private:     true,
-// 			Title:       "korma",
-// 			Ingridients: []models.Ingridient{"rice", "tofu", "butter"},
-// 			Time:        30,
-// 			Method:      "cook",
-// 			Tags:        []models.Tag{"indian", "curry"},
-// 		},
-// 	}
+func TestRecipeInsertFind(t *testing.T) {
+	t.Parallel()
 
-// 	for _, r := range recipes {
-// 		assertNil(t, w.InsertRecipe(r))
-// 		recipe, err := w.FindRecipeByID(r.ID)
-// 		assertNil(t, err)
+	recipes := []*models.Recipe{
+		{
+			ID:          11,
+			UserID:      7,
+			Private:     true,
+			Title:       "korma",
+			Ingridients: []models.Ingridient{"rice", "tofu", "butter"},
+			Time:        30,
+			Method:      "cook",
+			Tags:        []models.Tag{"indian", "curry"},
+		},
+	}
 
-// 		if !recipe.Equals(r) {
-// 			t.Fatalf("got: %v, expected: %v", recipe, r)
-// 		}
-// 	}
-// }
+	for _, r := range recipes {
+		assertNil(t, w.InsertRecipe(r))
+		recipe, err := w.FindRecipeByID(r.ID)
+		assertNil(t, err)
+
+		if !recipe.Equals(r) {
+			t.Fatalf("got: %v, expected: %v", recipe, r)
+		}
+	}
+}

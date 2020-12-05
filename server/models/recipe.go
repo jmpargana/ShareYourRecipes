@@ -1,5 +1,7 @@
 package models
 
+import "sort"
+
 type Recipe struct {
 	ID          int
 	UserID      int
@@ -27,6 +29,9 @@ func (r *Recipe) compareIngridients(other *Recipe) bool {
 		return false
 	}
 
+	sort.Sort(ByIngridient(r.Ingridients))
+	sort.Sort(ByIngridient(other.Ingridients))
+
 	for i := range r.Ingridients {
 		if r.Ingridients[i] != other.Ingridients[i] {
 			return false
@@ -40,6 +45,9 @@ func (r *Recipe) compareTags(other *Recipe) bool {
 	if len(r.Tags) != len(other.Tags) {
 		return false
 	}
+
+	sort.Sort(ByTag(r.Tags))
+	sort.Sort(ByTag(other.Tags))
 
 	for i := range r.Tags {
 		if r.Tags[i] != other.Tags[i] {
