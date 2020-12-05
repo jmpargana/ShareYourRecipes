@@ -1,10 +1,9 @@
 package db
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"server/models"
-	"time"
 )
 
 func (w *DBWrapper) InsertTags(id int, tags []models.Tag) error {
@@ -20,22 +19,10 @@ func (w *DBWrapper) InsertTag(id int, tag models.Tag) error {
 	tagID, err := w.FindTag(tag)
 
 	if err == ErrNoID {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		stmt, err := w.db.PrepareContext(ctx, insertTagQuery)
-		if err != nil {
-			return fmt.Errorf("failed preparing query: %s with: %s", insertTagQuery, err)
+		if err := w.execQueryWithPrepare(insertTagQuery, tag); err != nil {
+			return err
 		}
-		defer stmt.Close()
-
-		if _, err := stmt.ExecContext(ctx, tag); err != nil {
-			return fmt.Errorf("failed inserting tag with: %s", err)
-		}
-
 		tagID, err = w.FindTag(tag)
-	} else if err != nil {
-		return fmt.Errorf("nothing returned from select tag query: %s", err)
 	}
 
 	return w.InsertRecipeTag(id, tagID)
@@ -43,38 +30,26 @@ func (w *DBWrapper) InsertTag(id int, tag models.Tag) error {
 
 /// Insert Tag if non existent with NULL id and retrieve ID for recipetags table.
 func (w *DBWrapper) FindTag(tag models.Tag) (id int, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	err = w.db.QueryRowContext(ctx, selectTagByName, tag).
-		Scan(&id)
-
-	if err != nil {
-		return 0, ErrNoID
-	}
-
-	return
+	return w.queryID(
+		selectTagByName,
+		string(tag),
+	)
 }
 
 func (w *DBWrapper) FindTagsByRecipeID(r *models.Recipe) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	return w.queryRows(
+		selectTagsByRecipeID,
 
-	rows, err := w.db.QueryContext(ctx, selectTagsByRecipeID, r.ID)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var tag string
-		err := rows.Scan(&tag)
-		if err != nil {
-			return fmt.Errorf("failed scanning tag with: %s", err)
-		}
-
-		r.Tags = append(r.Tags, models.Tag(tag))
-	}
-
-	return nil
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				var tag string
+				if err := rows.Scan(&tag); err != nil {
+					return err
+				}
+				r.Tags = append(r.Tags, models.Tag(tag))
+			}
+			return nil
+		},
+		r.ID,
+	)
 }

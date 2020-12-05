@@ -1,10 +1,9 @@
 package db
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"server/models"
-	"time"
 )
 
 func (w *DBWrapper) InsertIngridients(id int, ingridients []models.Ingridient) error {
@@ -20,22 +19,10 @@ func (w *DBWrapper) InsertIngridient(id int, ingridient models.Ingridient) error
 	ingridientID, err := w.FindIngridient(ingridient)
 
 	if err == ErrNoID {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		stmt, err := w.db.PrepareContext(ctx, insertIngridientQuery)
-		if err != nil {
-			return fmt.Errorf("failed preparing query: %s with: %s", insertIngridientQuery, err)
+		if err := w.execQueryWithPrepare(insertIngridientQuery, ingridient); err != nil {
+			return err
 		}
-		defer stmt.Close()
-
-		if _, err := stmt.ExecContext(ctx, ingridient); err != nil {
-			return fmt.Errorf("failed inserting ingridient with: %s", err)
-		}
-
 		ingridientID, err = w.FindIngridient(ingridient)
-	} else if err != nil {
-		return fmt.Errorf("nothing returned from select tag query: %s", err)
 	}
 
 	return w.InsertRecipeIngridient(id, ingridientID)
@@ -43,38 +30,26 @@ func (w *DBWrapper) InsertIngridient(id int, ingridient models.Ingridient) error
 
 /// Insert Tag if non existent with NULL id and retrieve ID for recipetags table.
 func (w *DBWrapper) FindIngridient(ingridient models.Ingridient) (id int, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	err = w.db.QueryRowContext(ctx, selectIngridientByName, ingridient).
-		Scan(&id)
-
-	if err != nil {
-		return 0, ErrNoID
-	}
-
-	return
+	return w.queryID(
+		selectIngridientByName,
+		string(ingridient),
+	)
 }
 
 func (w *DBWrapper) FindIngridientsByRecipeID(r *models.Recipe) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	return w.queryRows(
+		selectIngridientsByRecipeID,
 
-	rows, err := w.db.QueryContext(ctx, selectIngridientsByRecipeID, r.ID)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var ingridient string
-		err := rows.Scan(&ingridient)
-		if err != nil {
-			return fmt.Errorf("failed scanning ingridient with: %s", err)
-		}
-
-		r.Ingridients = append(r.Ingridients, models.Ingridient(ingridient))
-	}
-
-	return nil
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				var ingridient string
+				if err := rows.Scan(&ingridient); err != nil {
+					return err
+				}
+				r.Ingridients = append(r.Ingridients, models.Ingridient(ingridient))
+			}
+			return nil
+		},
+		r.ID,
+	)
 }
