@@ -27,13 +27,10 @@ func (w *DBWrapper) FindRecipeByID(id int) (*models.Recipe, error) {
 		r.Private = true
 	}
 
-	if err := w.FindIngridientsByRecipeID(r); err != nil {
+	if err := w.appendTagsAndIngridients(r); err != nil {
 		return nil, err
 	}
 
-	if err := w.FindTagsByRecipeID(r); err != nil {
-		return nil, err
-	}
 	return r, nil
 }
 
@@ -62,37 +59,15 @@ func (w *DBWrapper) FindRecipesByIngridient(ingridient models.Ingridient) ([]*mo
 }
 
 func (w *DBWrapper) FindAllPublicRecipes() (r []*models.Recipe, err error) {
-	w.queryRows(
+	err = w.queryRows(
 		selectAllRecipes,
 
 		func(rows *sql.Rows) error {
 			for rows.Next() {
-				recipe := new(models.Recipe)
-				var private int
-				err = rows.Scan(
-					&recipe.ID,
-					&recipe.UserID,
-					&recipe.Private,
-					&recipe.Title,
-					&recipe.Time,
-					&recipe.Method,
-				)
-
+				recipe, err := w.scanRow(rows)
 				if err != nil {
-					return fmt.Errorf("failed scanning recipe with: %s", err)
-				}
-				if private == 1 {
-					recipe.Private = true
-				}
-
-				if err := w.FindIngridientsByRecipeID(recipe); err != nil {
 					return err
 				}
-
-				if err := w.FindTagsByRecipeID(recipe); err != nil {
-					return err
-				}
-
 				r = append(r, recipe)
 			}
 			rows.Close()
@@ -134,22 +109,8 @@ func (w *DBWrapper) UpdateRecipe(r *models.Recipe) error {
 }
 
 func (w *DBWrapper) DeleteRecipe(id int) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	stmt, err := w.db.PrepareContext(ctx, deleteRecipeByIDQuery)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.ExecContext(ctx, id)
-	return err
-}
-
-func (w *DBWrapper) insertOrUpdateTagsAndIngridients(r *models.Recipe) error {
-	if err := w.InsertTags(r.ID, r.Tags); err != nil {
-		return err
-	}
-	return w.InsertIngridients(r.ID, r.Ingridients)
+	return w.execQueryWithPrepare(
+		deleteRecipeByIDQuery,
+		id,
+	)
 }
