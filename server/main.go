@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"server/db"
 	"server/router"
 )
 
@@ -14,11 +15,14 @@ var (
 )
 
 func main() {
-	// _, err := db.New("mysql", db.GenerateDSN(user, password, endPoint, database), 0, 0)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	r := router.New()
+	dsn := db.GenerateDSN(user, password, endPoint, database)
+	sql, err := db.New("mysql", dsn, 0, 0)
+	if err != nil {
+		panic(err)
+	}
 
+	r := router.New(sql)
+
+	// TODO: dothe setup for HTTPS
 	http.ListenAndServe(":8080", r)
 }

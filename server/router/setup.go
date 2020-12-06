@@ -2,24 +2,27 @@ package router
 
 import (
 	"net/http"
+	"server/db"
 
 	"github.com/gorilla/mux"
 )
 
-var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Not Implemented"))
-})
+var sql *db.DBWrapper
 
-func New() *mux.Router {
+func New(database *db.DBWrapper) http.Handler {
+	jwtMiddleware := createJWTMiddleware()
+	corsWrapper := createCorsWrapper()
+	sql = database
+
 	r := mux.NewRouter()
 
-	r.Handle("/", http.FileServer(http.Dir("./views/")))
+	// API end points
+	r.Handle("/fetch", jwtMiddleware.Handler(http.HandlerFunc(GetRecipes))).Methods("GET")
+	r.Handle("/upload", jwtMiddleware.Handler(http.HandlerFunc(CreateRecipe))).Methods("POST")
+	r.Handle("/update", jwtMiddleware.Handler(http.HandlerFunc(UpdateRecipe))).Methods("POST")
+	r.Handle("/delete", jwtMiddleware.Handler(http.HandlerFunc(DeleteRecipe))).Methods("GET")
 
-	r.Handle("/status", NotImplemented).Methods("GET")
-	r.Handle("/products", NotImplemented).Methods("GET")
-	r.Handle("/products/{slug}/feedback", NotImplemented).Methods("POST")
+	// React App
 
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-
-	return r
+	return corsWrapper.Handler(r)
 }

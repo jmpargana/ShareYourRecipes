@@ -6,13 +6,18 @@ export default function Actions() {
   const [show, setShow] = useState(false);
   return (
     <Box>
-      <User /> 
-      <Logout />
+      <Button 
+        icon={<User />} 
+        onClick={() => setShow(!show)}
+      />
+      <Button 
+        icon={<Logout />} 
+        onClick={() => setShow(!show)}
+      />
       <Button 
         icon={<Add />} 
         onClick={() => setShow(!show)}
       />
-      <Add />
     </Box>
   );
 }
