@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Box,Paper, Chip, TextField} from '@material-ui/core';
 import {Autocomplete} from '@material-ui/lab';
 import {makeStyles} from '@material-ui/core/styles';
@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'flex-end',
     flexWrap: 'wrap',
     listStyle: 'none',
-    // padding: theme.spacing(0.5),
+    padding: theme.spacing(0.5),
     margin: 0,
   },
   chip: {
@@ -20,28 +20,38 @@ const useStyles = makeStyles((theme) => ({
 export default function SearchBar() {
   const classes = useStyles();
   const [value, setValue] = useState(null)
-  const [chipData, setChipData] = useState([
-    { key: 0, label: 'Angular' },
-    { key: 1, label: 'React' },
-    { key: 2, label: 'Vue' },
-    { key: 3, label: 'Long Chip Name' },
-    { key: 4, label: 'Another Name' },
-  ])
+  const [tags, setTags] = useState([{key: -1, label: "all"}])
 
-  const appendTag = tag => setChipData(chipData => [...chipData, tag]);
-
-  const defaultProps = {
-    options: recipes,
-    getOptionLabel: (option) => option.title,
+  const recipesToTags = () => {
+    const tags = []
+    recipes.map(recipe => tags.push(...recipe.tags))
+    const dedupTags = [...new Set(tags)]
+    return dedupTags.map((tag, index) => ({key: index, label: tag}))
   }
 
+  const [chipData, setChipData] = useState(recipesToTags)
+
+  // useEffect(() => {
+  // }, [chipData, tags])
+
+
+  // Delete from tags and reappend to list of suggestions
   const handleDeleteTag = (chipToDelete) => () => {
     setChipData((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
   }
 
+  // 1. Add to chips
+  // 2. Delete from suggestions
+  // 3. Reset value
   const handleAppendTag = tag => {
-    if (chipData.some(chip => tag === chip.label.toLowercase)) {
-      appendTag(tag)
+    if (chipData.some(chip => tag === chip)) {
+      // Add to chips
+      setTags(tags => [...tags, tag])
+
+      // Delete from available list
+      setChipData((chips) => chips.filter((chip) => chip.key !== tag.key));
+
+      // Reset list
       setValue('')
     }
   }
@@ -49,23 +59,23 @@ export default function SearchBar() {
   return (
     <Box>
       <Autocomplete
-        {...defaultProps}
         autoHighlight
         value={value}
         onChange={(_, newValue) => handleAppendTag(newValue)}
-        // onChange={(_, newValue) => setValue(newValue)}
+        options={chipData}
+        getOptionLabel={option => option ? option.label : ""}
         renderInput={
           (params) => 
             <TextField {...params} variant="outlined" margin="normal" />
         }
       />
       <Paper elevation={0} component='ul' className={classes.root}>
-        {chipData.map((data) => (
-          <li key={data.key}>
+        {tags.map((tag) => (
+          <li key={tag.key}>
             <Chip 
               color="primary"
-              label={data.label}
-              onDelete={handleDeleteTag(data)}
+              label={tag.label}
+              onDelete={handleDeleteTag(tag)}
               className={classes.chip}
             />
           </li>
@@ -74,6 +84,8 @@ export default function SearchBar() {
     </Box>
   );
 }
+
+
 
 const recipes = [
   {
@@ -106,4 +118,5 @@ const recipes = [
     method: "1. Prepare all ingridients...",
     tags: ['italian', 'pasta', 'vegan'],
   },
-]
+];
+
