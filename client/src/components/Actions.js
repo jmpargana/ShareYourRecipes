@@ -18,39 +18,31 @@ export default function Actions() {
       ? logout()
       : loginWithRedirect()
 
-  const fabs = [
-    {
-      color: 'secondary',
-      label: 'user',
-      icon: <Person onClick={handleUser} />,
-      style: classes.fab_user,
-    },
-    {
-      color: 'secondary',
-      label: 'add',
-      icon: <Add onClick={() => setShowAdd(true)} />,
-      style: classes.fab_add,
-    },
-    {
-      color: 'primary',
-      label: 'help',
-      icon: <Help onClick={() => setShowHelp(true)} />,
-      style: classes.fab_help,
-    },
-  ]
-
   return (
     <Box>
-      {fabs.map((fab, index) => (
+      <Fab 
+        color='secondary'
+        aria-label='user'
+        className={classes.fab_user}
+      >
+        <Person onClick={handleUser} />
+      </Fab>
+      <Fab 
+        color='primary'
+        aria-label='help'
+        className={classes.fab_help}
+      >
+        <Help onClick={() => setShowHelp(true)} />
+      </Fab>
+      {isAuthenticated ? (
         <Fab 
-          key={index} 
-          color={fab.color} 
-          aria-label={fab.label} 
-          className={fab.style}
+          color='secondary'
+          aria-label='add'
+          className={classes.fab_add}
         >
-          {fab.icon}
+          <Add onClick={() => setShowAdd(true)} />
         </Fab>
-      ))}
+      ) : ''}
       {showAdd && (<CreateRecipe toggler={setShowAdd} />)}
       {showHelp && (<HelpModal toggler={setShowHelp} />)}
     </Box>
