@@ -8,8 +8,11 @@ export default function RecipeBar({recipe}) {
 
   return (
     <Box>
-      <Text>{recipe.title} </Text>
-      <Text>{recipe.time} </Text>
+      <Box direction="row">
+        <Text size="large">{recipe.title} </Text>
+        <Box flex='grow' />
+        <Text color="blue">{recipe.time} </Text>
+      </Box>
       <Paper elevation={0} component='ul' className={classes.root}>
         {recipe.tags.map((tag, index) => (
           <li key={index}>

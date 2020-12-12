@@ -13,14 +13,6 @@ export default function App() {
           <Box direction='row' flex overflow={{ horizontal: 'hidden' }}>
             <Box flex align='center' justify='center'>
               <Home />
-            </Box>
-            <Box
-              width='medium'
-              background='light-2'
-              elevation='small'
-              align='center'
-              justify='center'
-            >
               <Actions />
             </Box>
           </Box>

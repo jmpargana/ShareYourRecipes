@@ -9,16 +9,13 @@ export default function Recipes() {
   return (
     <Box>
       {state.recipes.map((recipe, index) => (
-        <>
+        <React.Fragment key={index}>
           <RecipeBar 
             key={index} 
             recipe={recipe} 
           />
-          {index-1 !== state.recipes.length
-            ? <Divider />
-            : ""
-          }
-        </>
+           <Divider />
+        </React.Fragment>
       ))}
     </Box>
   );

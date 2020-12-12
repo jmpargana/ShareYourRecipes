@@ -12,6 +12,21 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: theme.spacing(0.5),
   },
+  fab_user: {
+    position: 'fixed',
+    top: theme.spacing(2),
+    right: theme.spacing(2),
+  },
+  fab_add: {
+    position: 'fixed',
+    top: theme.spacing(10),
+    right: theme.spacing(2),
+  },
+  fab_help: {
+    position: 'fixed',
+    top: theme.spacing(2),
+    left: theme.spacing(2),
+  },
 }));
 
 export default useStyles;
