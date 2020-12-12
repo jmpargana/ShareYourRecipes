@@ -3,6 +3,7 @@ import {Box,Paper, Chip, TextField} from '@material-ui/core';
 import {Autocomplete} from '@material-ui/lab';
 import useStyles from './styles';
 import { Context } from '../context/store';
+import MaterialTags from './randomColor'
 
 export default function SearchBar() {
   const classes = useStyles();

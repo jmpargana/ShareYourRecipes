@@ -40,6 +40,9 @@ const Context = createContext(initialState)
 
 const Reducer = (state, action) => {
   switch (action.type) {
+    case 'UPLOAD_TAGS':
+      // TODO:
+      return {}
     case 'UPLOAD_RECIPES':
       return {
         ...state,
