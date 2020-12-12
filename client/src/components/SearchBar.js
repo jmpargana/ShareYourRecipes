@@ -1,43 +1,45 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import {Box,Paper, Chip, TextField} from '@material-ui/core';
 import {Autocomplete} from '@material-ui/lab';
-import {makeStyles} from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    listStyle: 'none',
-    padding: theme.spacing(0.5),
-    margin: 0,
-  },
-  chip: {
-    margin: theme.spacing(0.5),
-  },
-}));
+import useStyles from './styles';
+import { Context } from '../context/store';
 
 export default function SearchBar() {
   const classes = useStyles();
   const [value, setValue] = useState(null)
-  const [tags, setTags] = useState([{key: -1, label: "all"}])
+  const [tags, setTags] = useState([])
+  const { state, dispatch } = useContext(Context);
+
+  const fetchRecipes = async () => {
+    const url = 'http://localhost:8000/recipes';
+    const options = {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=UTF0-8'
+      },
+    };
+
+    fetch(url, options)
+      .then(response => {
+        console.log(response)
+        dispatch({ type: "UPLOAD_RECIPES" });
+      })
+  }
+  // fetchRecipes();
 
   const recipesToTags = () => {
     const tags = []
-    recipes.map(recipe => tags.push(...recipe.tags))
+    state.recipes.map(recipe => tags.push(...recipe.tags))
     const dedupTags = [...new Set(tags)]
     return dedupTags.map((tag, index) => ({key: index, label: tag}))
   }
 
   const [chipData, setChipData] = useState(recipesToTags)
 
-  // useEffect(() => {
-  // }, [chipData, tags])
-
-
   // Delete from tags and reappend to list of suggestions
   const handleDeleteTag = (chipToDelete) => () => {
-    setChipData((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
+    setTags((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
   }
 
   // 1. Add to chips
@@ -52,7 +54,7 @@ export default function SearchBar() {
       setChipData((chips) => chips.filter((chip) => chip.key !== tag.key));
 
       // Reset list
-      setValue('')
+      setValue(null)
     }
   }
 
@@ -86,37 +88,4 @@ export default function SearchBar() {
 }
 
 
-
-const recipes = [
-  {
-    id: 1,
-    userId: 2,
-    title: "Delicious Vegan Korma",
-    private: true,
-    ingridients: ["rice", "tofu", "cream", "tomatoes"],
-    time: 30,
-    method: "1. Prepare all ingridients...",
-    tags: ['indian', 'curry', 'korma', 'tofu'],
-  },
-  {
-    id: 2,
-    userId: 2,
-    title: "Chop Suoey",
-    private: true,
-    ingridients: ["rice", "tofu", "noodles", "Soy"],
-    time: 30,
-    method: "1. Prepare all ingridients...",
-    tags: ['chinese', 'spicy', 'noodles', 'tofu'],
-  },
-  {
-    id: 3,
-    userId: 1,
-    title: "Pasta Aglio al Olio",
-    private: true,
-    ingridients: ["olive oil", "pasta", "garlic", "tomatoes"],
-    time: 30,
-    method: "1. Prepare all ingridients...",
-    tags: ['italian', 'pasta', 'vegan'],
-  },
-];
 

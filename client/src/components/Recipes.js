@@ -1,16 +1,25 @@
-import React from 'react';
-import {List} from 'grommet';
+import React, {useContext} from 'react';
+import {Box, Divider} from '@material-ui/core';
+import { Context } from '../context/store';
+import RecipeBar from './RecipeBar';
 
 export default function Recipes() {
+  const { state } = useContext(Context);
+
   return (
-    <List
-      primaryKey="name"
-      data={[
-        {name: "Olah"},
-        {name: "Olah"},
-        {name: "Olah"},
-        {name: "Olah"},
-      ]}
-    />
+    <Box>
+      {state.recipes.map((recipe, index) => (
+        <>
+          <RecipeBar 
+            key={index} 
+            recipe={recipe} 
+          />
+          {index-1 !== state.recipes.length
+            ? <Divider />
+            : ""
+          }
+        </>
+      ))}
+    </Box>
   );
 }
